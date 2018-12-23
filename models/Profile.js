@@ -42,7 +42,7 @@ const ProfileSchema = new Schema({
       }
     },
     {
-      company: {
+      place: {
         type: String
       }
     },

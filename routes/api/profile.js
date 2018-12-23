@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 
+const validateProfileInput = require('../../validation/profile');
+
 const Profile = require('../../models/Profile');
 const User = require('../../models/Users');
 
@@ -25,6 +27,12 @@ router.get('/', passport.authenticate('jwt', {session: false}), (req, res) => {
 // @desc Create user profile
 router.post('/', passport.authenticate('jwt', {session: false}), (req, res) => {
   // Get fields
+  const { errors, isValid } = validateProfileInput(req.body);
+
+  if(!isValid) {
+    return res.status(400).json(errors);
+  }
+
   const profileFields = {};
   // We have the user object on the req.user
   // Start building the profile object
@@ -34,6 +42,11 @@ router.post('/', passport.authenticate('jwt', {session: false}), (req, res) => {
   if(req.body.location) profileFields.location = req.body.location;
   if(req.body.bio) profileFields.bio = req.body.bio;
   if(req.body.status) profileFields.status = req.body.status;
+  if(req.body.website) profileFields.website = req.body.website;
+  if(req.body.company) profileFields.company = req.body.company;
+
+
+
   if(req.body.githubusername) profileFields.githubusername = req.body.githubusername;
   if(typeof req.body.skills !== 'undefined') {
     profileFields.skills = req.body.skills.split(',');
@@ -67,10 +80,10 @@ router.post('/', passport.authenticate('jwt', {session: false}), (req, res) => {
             }
 
             // Save profileFieldsnew Profile()
-            new Profile(profileFields).save().then(profile => res.json(profile))
-          })
+            new Profile(profileFields).save().then(profile => res.json(profile));
+          });
       }
-    })
+    });
 
 });
 
